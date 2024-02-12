@@ -20,84 +20,91 @@ pub struct IfStmt {
     pub else_branch: Option<Vec<Stmt>>,
 }
 
-pub fn parse_stmt(tokens: &mut Vec<Token>, current: &mut usize) -> Stmt {
-    match tokens.get(*current) {
-        Some(Token::Let) => {
+#[derive(Debug)]
+pub(crate) enum ParseError {
+    UnexpectedToken,
+    ExpectedIdentifier,
+    ExpectedEqualSign,
+    ExpectedOpenParen,
+    ExpectedCloseParen,
+    ExpectedOpenBrace,
+}
+
+pub(crate) fn parse_stmt(tokens: &mut Vec<Token>, current: &mut usize) -> Result<Stmt, ParseError> {
+    let current_token = tokens.get(*current).ok_or(ParseError::UnexpectedToken)?;
+    match current_token {
+        Token::Let => {
             *current += 1;
-            match tokens.get(*current) {
-                Some(Token::Identifier(_)) => {
-                    let name = tokens.get(*current).unwrap().clone();
-                    *current += 1;
-                    if let Some(Token::Equal) = tokens.get(*current) {
-                        *current += 1;
-                        let initializer = parse_expr(tokens, current);
-                        match name {
-                            Token::Identifier(name_str) => {
-                                Stmt::VarDecl(VarDecl {
-                                    name: name_str,
-                                    initializer,
-                                })
-                            }
-                            _ => panic!("Expected an identifier"),
-                        }
-                    } else {
-                        panic!("Expected '='");
-                    }
-                }
-                _ => panic!("Expected an identifier"),
-            }
+            parse_var_decl(tokens, current)
         }
-        Some(Token::If) => {
+        Token::If => {
             *current += 1;
-            if let Some(Token::OpenParen) = tokens.get(*current) {
-                *current += 1;
-                let condition = parse_expr(tokens, current);
-                if let Some(Token::CloseParen) = tokens.get(*current) {
-                    *current += 1;
-                    if let Some(Token::OpenBrace) = tokens.get(*current) {
-                        let mut then_branch = Vec::new();
-                        *current += 1;
-                        while let Some(token) = tokens.get(*current) {
-                            if token == &Token::CloseBrace {
-                                *current += 1;
-                                break;
-                            }
-                            then_branch.push(parse_stmt(tokens, current));
-                        }
-                        // else clause parsing
-                        let mut else_branch = None;
-                        if let Some(Token::Else) = tokens.get(*current) {
-                            *current += 1;
-                            if let Some(Token::OpenBrace) = tokens.get(*current) {
-                                *current += 1;  // Skip '{'
-                                let mut else_statements = Vec::new();
-                                while let Some(token) = tokens.get(*current) {
-                                    if token == &Token::CloseBrace {
-                                        *current += 1;
-                                        break;
-                                    }
-                                    else_statements.push(parse_stmt(tokens, current));
-                                }
-                                else_branch = Some(else_statements);
-                            } else {
-                                panic!("Expected '{{'");
-                            }
-                        }
-                        Stmt::IfStmt(IfStmt {
-                            condition,
-                            then_branch,
-                            else_branch,
-                        })
-                    } else {
-                        panic!("Expected '{{'");
-                    }
-                } else {
-                    panic!("Expected ')'");
-                }
-            } else {
-                panic!("Expected '('");
-            }
+            parse_if_stmt(tokens, current)
         }
-        _ => panic!("Unexpected token"),
+        _ => Err(ParseError::UnexpectedToken),
     }
+}
+
+fn parse_var_decl(tokens: &mut Vec<Token>, current: &mut usize) -> Result<Stmt, ParseError> {
+    let name = match tokens.get(*current).ok_or(ParseError::ExpectedIdentifier)? {
+        Token::Identifier(_) => tokens.get(*current).unwrap().clone(),
+        _ => return Err(ParseError::ExpectedIdentifier),
+    };
+    *current += 1;
+    match tokens.get(*current).ok_or(ParseError::ExpectedEqualSign)? {
+        Token::Equal => *current += 1,
+        _ => return Err(ParseError::ExpectedEqualSign),
+    };
+    let initializer = parse_expr(tokens, current);
+    match name {
+        Token::Identifier(name_str) => Ok(Stmt::VarDecl(VarDecl { name: name_str, initializer })),
+        _ => Err(ParseError::ExpectedIdentifier),
+    }
+}
+
+fn parse_if_stmt(tokens: &mut Vec<Token>, current: &mut usize) -> Result<Stmt, ParseError> {
+    match tokens.get(*current).ok_or(ParseError::ExpectedOpenParen)? {
+        Token::OpenParen => *current += 1,
+        _ => return Err(ParseError::ExpectedOpenParen),
+    };
+    let condition = parse_expr(tokens, current);
+    match tokens.get(*current).ok_or(ParseError::ExpectedCloseParen)? {
+        Token::CloseParen => *current += 1,
+        _ => return Err(ParseError::ExpectedCloseParen),
+    };
+    match tokens.get(*current).ok_or(ParseError::ExpectedOpenBrace)? {
+        Token::OpenBrace => *current += 1,
+        _ => return Err(ParseError::ExpectedOpenBrace),
+    };
+    let then_branch = parse_statements_until_close_brace(tokens, current)?;
+    let else_branch = if let Some(Token::Else) = tokens.get(*current) {
+        *current += 1;
+        match tokens.get(*current) {
+            Some(Token::OpenBrace) => {
+                *current += 1;
+                Some(parse_statements_until_close_brace(tokens, current)?)
+            }
+            _ => None,
+        }
+    } else {
+        None
+    };
+    Ok(Stmt::IfStmt(IfStmt { condition, then_branch, else_branch }))
+}
+
+fn parse_statements_until_close_brace(tokens: &mut Vec<Token>, current: &mut usize) -> Result<Vec<Stmt>, ParseError> {
+    let mut statements = Vec::new();
+    loop {
+        if let Some(token) = tokens.get(*current) {
+            if token == &Token::CloseBrace {
+                *current += 1;
+                break;
+            }
+        }
+        match parse_stmt(tokens, current) {
+            Ok(stmt) => statements.push(stmt),
+            Err(_) => continue, // ステートメントのパースに失敗した場合、次のステートメントに進む
+        };
+    }
+    Ok(statements)
 }

@@ -1,3 +1,4 @@
+use crate::parser::stmt::ParseError;
 use crate::lexer::Token;
 use crate::parser::stmt::Stmt;
 
@@ -14,11 +15,12 @@ impl Parser {
         Self { tokens, current: 0 }
     }
 
-    pub fn parse(&mut self) -> Vec<Stmt> {
+    pub fn parse(&mut self) -> Result<Vec<Stmt>, ParseError> {
         let mut stmts = Vec::new();
         while self.current < self.tokens.len() {
-            stmts.push(stmt::parse_stmt(&mut self.tokens, &mut self.current));
+            let stmt = stmt::parse_stmt(&mut self.tokens, &mut self.current)?;
+            stmts.push(stmt);
         }
-        stmts
+        Ok(stmts)
     }
 }

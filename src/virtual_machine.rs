@@ -29,11 +29,15 @@ impl<R: Read> VirtualMachine<R> {
 
             // Parsing
             let mut parser = Parser::new(tokens);
-            let stmts = parser.parse();
-
-            // Output
-            for stmt in stmts {
-                println!("{:?}", stmt);
+            match parser.parse() {
+                Ok(stmts) => {
+                    for stmt in stmts {
+                        println!("{:?}", stmt);
+                    }
+                },
+                Err(err) => {
+                    eprintln!("Parsing error: {:?}", err);
+                },
             }
 
             line.clear();
