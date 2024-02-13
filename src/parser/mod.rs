@@ -1,5 +1,5 @@
-use crate::parser::stmt::ParseError;
 use crate::lexer::Token;
+use crate::parser::stmt::ParseError;
 use crate::parser::stmt::Stmt;
 
 mod stmt;
@@ -16,9 +16,9 @@ impl Parser {
     }
 
     pub fn parse(&mut self) -> Result<Vec<Stmt>, ParseError> {
-        let mut stmts = Vec::new();
+        let mut stmts: Vec<stmt> = Vec::new();
         while self.current < self.tokens.len() {
-            let stmt = stmt::parse_stmt(&mut self.tokens, &mut self.current)?;
+            let stmt: Stmt = stmt::parse_stmt(&mut self.tokens, &mut self.current)?;
             stmts.push(stmt);
         }
         Ok(stmts)
