@@ -37,6 +37,14 @@ pub(crate) fn parse_stmt(tokens: &mut Vec<Token>, current: &mut usize) -> Result
             *current += 1;
             parse_var_decl(tokens, current)
         }
+        Token::Echo => {
+            *current += 1;
+            println!("{:?}", tokens.get(*current).unwrap());
+            Ok(Stmt::VarDecl(VarDecl {
+                name: "echo".to_string(),
+                initializer: parse_expr(tokens, current),
+            }))
+        }
         Token::If => {
             *current += 1;
             parse_if_stmt(tokens, current)
