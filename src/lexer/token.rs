@@ -3,6 +3,7 @@ pub enum Token {
     If,
     Else,
     Let,
+    Echo,
     Identifier(String),
     Equal,
     OpenParen,

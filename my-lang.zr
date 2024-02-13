@@ -1,0 +1,5 @@
+let x = 1
+echo x
+if (x) {let y = 2} else {let z = 3}
+echo y
+echo z

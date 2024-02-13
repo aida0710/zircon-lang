@@ -16,7 +16,7 @@ impl Parser {
     }
 
     pub fn parse(&mut self) -> Result<Vec<Stmt>, ParseError> {
-        let mut stmts: Vec<stmt> = Vec::new();
+        let mut stmts = Vec::new();
         while self.current < self.tokens.len() {
             let stmt: Stmt = stmt::parse_stmt(&mut self.tokens, &mut self.current)?;
             stmts.push(stmt);
