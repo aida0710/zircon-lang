@@ -17,7 +17,6 @@ impl Lexer {
 
     pub fn lex(&mut self) -> Vec<Token> {
         let mut tokens = Vec::new();
-        println!("{:?}", self.input);
         while let Some(&c) = self.input.get(self.current) {
             match c {
                 ' ' | '\n' | '\r' | '\t' => self.current += 1,

@@ -5,6 +5,7 @@ use crate::parser::expr::{Expr, parse_expr};
 pub enum Stmt {
     VarDecl(VarDecl),
     IfStmt(IfStmt),
+    EchoStmt(EchoStmt),
 }
 
 #[derive(Debug, PartialEq)]
@@ -18,6 +19,11 @@ pub struct IfStmt {
     pub condition: Expr,
     pub then_branch: Vec<Stmt>,
     pub else_branch: Option<Vec<Stmt>>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct EchoStmt {
+    pub expr: Expr,
 }
 
 #[derive(Debug)]
@@ -39,11 +45,7 @@ pub(crate) fn parse_stmt(tokens: &mut Vec<Token>, current: &mut usize) -> Result
         }
         Token::Echo => {
             *current += 1;
-            println!("{:?}", tokens.get(*current).unwrap());
-            Ok(Stmt::VarDecl(VarDecl {
-                name: "echo".to_string(),
-                initializer: parse_expr(tokens, current),
-            }))
+            parse_echo_stmt(tokens, current)
         }
         Token::If => {
             *current += 1;
@@ -51,6 +53,11 @@ pub(crate) fn parse_stmt(tokens: &mut Vec<Token>, current: &mut usize) -> Result
         }
         _ => Err(ParseError::UnexpectedToken),
     }
+}
+
+fn parse_echo_stmt(tokens: &mut Vec<Token>, current: &mut usize) -> Result<Stmt, ParseError> {
+    let expr = parse_expr(tokens, current);
+    Ok(Stmt::EchoStmt(EchoStmt { expr }))
 }
 
 fn parse_var_decl(tokens: &mut Vec<Token>, current: &mut usize) -> Result<Stmt, ParseError> {

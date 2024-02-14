@@ -2,8 +2,8 @@ use crate::lexer::Token;
 use crate::parser::stmt::ParseError;
 use crate::parser::stmt::Stmt;
 
-mod stmt;
-mod expr;
+pub(crate) mod stmt;
+pub(crate) mod expr;
 
 pub struct Parser {
     tokens: Vec<Token>,
