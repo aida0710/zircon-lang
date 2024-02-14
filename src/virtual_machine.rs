@@ -2,12 +2,14 @@ use std::io::BufRead;
 use std::io::BufReader;
 use std::io::Read;
 
+use crate::interpreter::interpreter::Interpreter;
 use crate::lexer::Lexer;
 use crate::parser::Parser;
 
 pub struct VirtualMachine<R: Read> {
     reader: BufReader<R>,
 }
+
 
 impl<R: Read> VirtualMachine<R> {
     pub fn new(stream: R) -> Self {
@@ -31,13 +33,12 @@ impl<R: Read> VirtualMachine<R> {
             let mut parser = Parser::new(tokens);
             match parser.parse() {
                 Ok(stmts) => {
-                    for stmt in stmts {
-                        println!("{:?}", stmt);
-                    }
-                },
+                    let mut interpreter = Interpreter::new();
+                    interpreter.interpret(stmts);
+                }
                 Err(err) => {
                     eprintln!("Parsing error: {:?}", err);
-                },
+                }
             }
 
             line.clear();
