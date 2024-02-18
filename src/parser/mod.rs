@@ -38,10 +38,11 @@ impl Parser {
                                     break;
                                 }
                             }
-                        },
+                        }
                         None => break,
                     };
                     ast.push(Statement::Let(var_name, value));
+                    assert_eq!(tokens.next().map(String::as_str), Some(";"));
                 }
                 "print" => {
                     assert_eq!(tokens.next().map(String::as_str), Some("("));
@@ -52,6 +53,7 @@ impl Parser {
                     };
                     assert_eq!(tokens.next().map(String::as_str), Some(")"));
                     ast.push(Statement::Print(var_name));
+                    assert_eq!(tokens.next().map(String::as_str), Some(";"));
                 }
                 _ => parser.push(token.to_string()),
             }
