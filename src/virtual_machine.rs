@@ -34,6 +34,8 @@ impl<R: Read> VirtualMachine<R> {
 
         // Parsing
         let mut parser = Parser { tokens: tokens.clone() };
-        let parser: Vec<String> = parser.read_lexer();
+        let parser: Vec<String> = parser.lexer_parse();
+
+        println!("parser => {:?}", parser);
     }
 }
