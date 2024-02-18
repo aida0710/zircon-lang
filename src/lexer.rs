@@ -32,12 +32,25 @@ impl Lexer {
         let mut token: String = String::new();
         for c in lexer {
             match c {
-                '{' | '}' | '(' | ')' | ';' | '=' | '"' => {
+                '{' | '}' | '(' | ')' | ';' | '=' => {
                     if token.len() > 0 {
                         tokens.push(token.clone());
                         token.clear();
                     }
                     tokens.push(c.to_string());
+                }
+                '"' => {
+                    if token.starts_with("\"") {
+                        token.push(*c);
+                        tokens.push(token.clone());
+                        token.clear();
+                    } else if token.len() > 0 {
+                        tokens.push(token.clone());
+                        token.clear();
+                        token.push(*c);
+                    } else {
+                        token.push(*c);
+                    }
                 }
                 '\n' | '\r' => {
                     continue;
