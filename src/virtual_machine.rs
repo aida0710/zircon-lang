@@ -2,7 +2,6 @@ use std::io::BufRead;
 use std::io::BufReader;
 use std::io::Read;
 
-use crate::interpreter::interpreter::Interpreter;
 use crate::lexer::Lexer;
 use crate::parser::Parser;
 
@@ -19,29 +18,22 @@ impl<R: Read> VirtualMachine<R> {
     }
 
     pub fn run(&mut self) {
-        let mut line = String::new();
+        let mut line: String = String::new();
         while let Ok(bytes_read) = self.reader.read_line(&mut line) {
             if bytes_read == 0 {
                 break;
             }
-
-            // Lexing
-            let mut lexer = Lexer::new(&line);
-            let tokens = lexer.lex();
-
-            // Parsing
-            let mut parser = Parser::new(tokens);
-            match parser.parse() {
-                Ok(stmts) => {
-                    let mut interpreter = Interpreter::new();
-                    interpreter.interpret(stmts);
-                }
-                Err(err) => {
-                    eprintln!("Parsing error: {:?}", err);
-                }
-            }
-
-            line.clear();
         }
+
+        println!("file => {}", line);
+
+        // Lexing
+        let mut lexer = Lexer { input: line.clone() };
+        let tokens: Vec<String> = lexer.read_char();
+        println!("lexer => {:?}", tokens);
+
+        // Parsing
+        let mut parser = Parser { tokens: tokens.clone() };
+        let parser: Vec<String> = parser.read_lexer();
     }
 }
