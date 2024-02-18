@@ -1,6 +1,6 @@
 let x = 1;
 print(x);
-if (x) {
+if (x === 1) {
     let y = 2;
 } else {
     let z = 3;
