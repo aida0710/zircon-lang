@@ -6,15 +6,15 @@ pub struct Lexer {
 
 impl Lexer {
     pub fn read_char(&mut self) -> Vec<String> {
-        let result: Vec<char> = self.input.chars().collect::<Vec<char>>();
-        let mut lexer: Vec<char> = self.char_filter(result);
+        let mut lexer: Vec<char> = self.input.chars().collect::<Vec<char>>();
+        //let mut lexer: Vec<char> = self.char_filter(result);
 
         let token: Vec<String> = self.tokenizer(&mut lexer);
         return token;
     }
 
     //文字をフィルタリング
-    fn char_filter(&self, result: Vec<char>) -> Vec<char> {
+    /*fn char_filter(&self, result: Vec<char>) -> Vec<char> {
         let mut filtered: Vec<char> = Vec::new();
         for c in result {
             match c {
@@ -23,7 +23,7 @@ impl Lexer {
             }
         }
         return filtered;
-    }
+    }*/
 
     //文字を分割
     fn tokenizer(&mut self, lexer: &mut Vec<char>) -> Vec<String> {
@@ -32,12 +32,15 @@ impl Lexer {
         let mut token: String = String::new();
         for c in lexer {
             match c {
-                '{' | '}' | '(' | ')' | ';' | '=' => {
+                '{' | '}' | '(' | ')' | ';' | '=' | '"' => {
                     if token.len() > 0 {
                         tokens.push(token.clone());
                         token.clear();
                     }
                     tokens.push(c.to_string());
+                }
+                '\n' | '\r' => {
+                    continue;
                 }
                 _ => token.push(*c),
             }
