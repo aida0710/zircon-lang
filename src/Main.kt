@@ -12,4 +12,7 @@ fun main(args: Array<String>) {
     println(fileContent)
 
     // TODO: fileContentを解析し、自作言語のコードを実行
+    val vm = VirtualMachine(fileContent)
+    vm.run()
+
 }

@@ -1,11 +1,5 @@
-let x = 1;
-print(x);
-if (x === 1) {
-    let y = 2;
-} else {
-    let z = 3;
-};
-print(y);
-print(z);
-
-print("Hello, World!");
+print Hello, World!;
+print "Hello, World!";
+print 'Hello, World!';
+set x 10;
+print x;
