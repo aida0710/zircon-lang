@@ -45,7 +45,6 @@ class Tokenizer(private val input: String) {
                 else -> pos++ // それ以外の文字は無視
             }
         }
-        println(tokens)
         return tokens
     }
 }
