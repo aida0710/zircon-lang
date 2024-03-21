@@ -15,9 +15,9 @@ class Tokenizer(private val input: String) {
         val tokens = mutableListOf<Token>()
 
         while (pos < input.length) {
-            when {
-                "{([".contains(input[pos]) -> tokens.add(Token.SequenceStart(input[pos++].toString())) // 開始括弧の解析
-                ")}]".contains(input[pos]) -> tokens.add(Token.SequenceEnd(input[pos++].toString())) // 終了括弧の解析
+            when { // 開始括弧の解析
+                "{([".contains(input[pos]) -> tokens.add(Token.SequenceStart(input[pos++].toString())) // 終了括弧の解析
+                ")}]".contains(input[pos]) -> tokens.add(Token.SequenceEnd(input[pos++].toString()))
                 input[pos].isDigit() -> { // 数字の解析
                     val start = pos
                     while (pos < input.length && input[pos].isDigit()) pos++
