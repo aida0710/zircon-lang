@@ -11,8 +11,6 @@ class VirtualMachine(private val code: String) {
         println("Parsed expression: $expr")
 
         val interpreter = Interpreter()
-        val result = interpreter.eval(expr)
 
-        println(result)
     }
 }
