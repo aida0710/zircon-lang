@@ -4,6 +4,4 @@ class ASTHandler {
     fun addNode(node: ASTNode) {
         nodes.add(node)
     }
-
-    // 他のメソッドもここに追加できます
 }
