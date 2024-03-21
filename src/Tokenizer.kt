@@ -7,7 +7,7 @@ class Tokenizer(private val input: String) {
         data class Number(val string: kotlin.String) : Token() // 数字: 123
         data class String(val string: kotlin.String) : Token() // 文字列: "abc"
         data class Symbol(val string: kotlin.String) : Token() // シンボル: abc
-        data class Operator(val string: kotlin.String): Token() // 演算子: +, -, *, /, %, ^, <, >, =
+        data class Operator(val string: kotlin.String) : Token() // 演算子: +, -, *, /, %, ^, <, >, =
         data class Punctuation(val string: kotlin.String) : Token() // 句読点: ., ,
     }
 
@@ -23,6 +23,7 @@ class Tokenizer(private val input: String) {
                     while (pos < input.length && input[pos].isDigit()) pos++
                     tokens.add(Token.Number(input.substring(start until pos)))
                 }
+
                 input[pos] == '"' -> { // 文字列の解析
                     pos++
                     val start = pos
@@ -30,18 +31,28 @@ class Tokenizer(private val input: String) {
                     tokens.add(Token.String(input.substring(start until pos)))
                     pos++
                 }
-                input[pos].isLetterOrDigit() || input[pos] == '_' -> { // シンボルの解析
+
+                input[pos].isLetterOrDigit() || input[pos] == '_' -> {
                     val start = pos
-                    while (pos < input.length && (input[pos].isLetterOrDigit() || input[pos] == '_') ||
-                        "+-*/%^<>=".contains(input[pos])) pos++
+                    while (pos < input.length && (input[pos].isLetterOrDigit() || input[pos] == '_' || "+-*/%^<>=".contains(
+                            input[pos]
+                        )) && input[pos] != '='
+                    ) pos++
                     tokens.add(Token.Symbol(input.substring(start until pos)))
                 }
+
+                input[pos] == '=' -> { // Added this line to handle '=' separately
+                    tokens.add(Token.Operator(input[pos++].toString()))
+                }
+
                 "+-*/%^<>=".contains(input[pos]) -> { // 演算子の解析
                     tokens.add(Token.Operator(input[pos++].toString()))
                 }
+
                 ",.".contains(input[pos]) -> { // 句読点の解析
                     tokens.add(Token.Punctuation(input[pos++].toString()))
                 }
+
                 else -> pos++ // それ以外の文字は無視
             }
         }

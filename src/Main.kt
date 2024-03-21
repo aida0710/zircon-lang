@@ -11,5 +11,4 @@ fun main(args: Array<String>) {
 
     val vm = VirtualMachine(fileContent)
     vm.run()
-
 }
