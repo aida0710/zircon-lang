@@ -5,3 +5,13 @@ echo(variable);
 
 set variable = "Hello World!";
 echo(variable);
+
+if (variable == "Hello World!") {
+    echo("Variable is Hello World!");
+} else {
+    echo("Variable is not Hello World!");
+}
+
+loop (i = 0; i < 5; i++) {
+    echo(i);
+}
