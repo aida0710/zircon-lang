@@ -34,18 +34,28 @@ class Parser(private val input: List<Tokenizer.Token>, private val astHandler: A
                 is Tokenizer.Token.Operator -> ASTNode.Operator(token.string)
                 // シンボルのトークンを解析する
                 is Tokenizer.Token.Symbol -> {
-                    val children = mutableListOf<ASTNode>()
-                    // シーケンスの終了トークンが出るまで解析を続ける
-                    while (pos < input.size && input[pos] !is Tokenizer.Token.SequenceEnd) {
-                        val subTree = parse()
-                        if (subTree != null) {
-                            // 解析結果のノードを子ノードとして追加する
-                            children.add(subTree)
-                        } else if (errorMessage != null) {
+                    val symbol = ASTNode.Symbol(token.string)
+                    if (pos < input.size && input[pos] is Tokenizer.Token.SequenceStart) {
+                        // シーケンスの開始トークンが続く場合は、引数を解析する
+                        pos++
+                        val children = mutableListOf<ASTNode>()
+                        while (pos < input.size && input[pos] !is Tokenizer.Token.SequenceEnd) {
+                            val subTree = parse()
+                            if (subTree != null) {
+                                children.add(subTree)
+                            } else if (errorMessage != null) {
+                                return null
+                            }
+                        }
+                        if (pos >= input.size || input[pos] !is Tokenizer.Token.SequenceEnd) {
+                            errorMessage = "Unexpected end of input"
                             return null
                         }
+                        pos++
+                        return ASTNode.Sequence(symbol.name, children)
+                    } else {
+                        return symbol
                     }
-                    ASTNode.Sequence(token.string, children)
                 }
                 // シーケンス開始のトークンを解析する
                 is Tokenizer.Token.SequenceStart -> {
@@ -54,29 +64,25 @@ class Parser(private val input: List<Tokenizer.Token>, private val astHandler: A
                     while (pos < input.size && input[pos] !is Tokenizer.Token.SequenceEnd) {
                         val subTree = parse()
                         if (subTree != null) {
-                            // 解析結果のノードを子ノードとして追加する
                             children.add(subTree)
                         } else if (errorMessage != null) {
                             return null
                         }
                     }
                     if (pos >= input.size || input[pos] !is Tokenizer.Token.SequenceEnd) {
-                        // 予期しない入力の終わりの場合はエラーメッセージを設定する
                         errorMessage = "Unexpected end of input"
                         return null
                     }
                     pos++
-                    ASTNode.Sequence(token.string, children)
+                    return ASTNode.Sequence(token.string, children)
                 }
                 else -> {
-                    // 未知のトークンタイプの場合はエラーメッセージを設定する
                     errorMessage = "Unknown token type: $token"
                     null
                 }
             }
         } else {
             if (errorMessage != null) {
-                // エラーメッセージがある場合は例外を投げる
                 throw RuntimeException("Parse error: $errorMessage")
             }
             return null

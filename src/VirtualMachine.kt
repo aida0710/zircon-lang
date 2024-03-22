@@ -12,6 +12,7 @@ class VirtualMachine(private val code: String) {
 
         val interpreter = Interpreter()
         exprs.forEach { expr ->
+            println("Interpreting expression: $expr")
             val result = expr?.accept(interpreter)
             println("Interpreted result: $result")
         }
