@@ -10,19 +10,29 @@ class CommandExecutor(private val variables: MutableMap<String, ASTNode>) {
      */
     fun executeEchoCommand(node: ASTNode.Sequence, visitor: ASTNodeVisitor): ASTNode? {
         println("Echo command")
-        when (val argument = node.children.getOrNull(0)?.accept(visitor)) {
-            is ASTNode.String -> println(argument.value)
-            is ASTNode.Number -> println(argument.value)
-            is ASTNode.Symbol -> {
-                when (val value = variables[argument.name]) {
-                    is ASTNode.String -> println(value.value)
-                    is ASTNode.Number -> println(value.value)
-                    null -> throw RuntimeException("Undefined variable: ${argument.name}")
-                    else -> throw RuntimeException("Invalid variable value for echo command: $value")
+        val arguments = node.children.map { child ->
+            when (val result = child.accept(visitor)) {
+                is ASTNode.String -> result.value
+                is ASTNode.Number -> result.value.toString()
+                is ASTNode.Symbol -> {
+                    when (val value = variables[result.name]) {
+                        is ASTNode.String -> value.value
+                        is ASTNode.Number -> value.value.toString()
+                        null -> throw RuntimeException("Undefined variable: ${result.name}")
+                        else -> throw RuntimeException("Invalid variable value for echo command: $value")
+                    }
                 }
+                is ASTNode.Sequence -> {
+                    when (val evaluatedSequence = result.accept(visitor)) {
+                        is ASTNode.String -> evaluatedSequence.value
+                        is ASTNode.Number -> evaluatedSequence.value.toString()
+                        else -> throw RuntimeException("Invalid sequence result for echo command: $evaluatedSequence")
+                    }
+                }
+                else -> throw RuntimeException("Invalid argument for echo command: $result")
             }
-            else -> throw RuntimeException("Invalid argument for echo command: $argument")
         }
+        println(arguments.joinToString(" "))
         return null
     }
 

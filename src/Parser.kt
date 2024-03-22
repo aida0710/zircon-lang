@@ -183,7 +183,6 @@ class Parser(private val input: List<Tokenizer.Token>, private val astHandler: A
                     null
                 }
             }
-
             else -> {
                 errorMessage = "Unexpected token: $token"
                 null
