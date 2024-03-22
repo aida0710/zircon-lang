@@ -1,6 +1,6 @@
 /**
  * 字句解析器クラス
- * @property input 入力文字列
+ * @property input 入力文字列(ファイルデータ)
  */
 class Tokenizer(private val input: String) {
     private var pos = 0
@@ -53,7 +53,7 @@ class Tokenizer(private val input: String) {
     }
 
     /**
-     * 入力文字列をトークン化する
+     * 入力文字列をトークン化
      * @return トークンのリスト
      */
     fun tokenize(): List<Token> {
@@ -76,7 +76,7 @@ class Tokenizer(private val input: String) {
     }
 
     /**
-     * 数字トークンを解析する
+     * 数字トークンを解析
      * @return 数字トークン
      */
     private fun parseNumber(): Token.Number {
@@ -86,7 +86,7 @@ class Tokenizer(private val input: String) {
     }
 
     /**
-     * 文字列トークンを解析する
+     * 文字列トークンを解析
      * @return 文字列トークン
      */
     private fun parseString(): Token.String {
@@ -99,7 +99,7 @@ class Tokenizer(private val input: String) {
     }
 
     /**
-     * シンボルトークンを解析する
+     * シンボルトークンを解析
      * @return シンボルトークン
      */
     private fun parseSymbol(): Token.Symbol {

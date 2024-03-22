@@ -3,6 +3,5 @@ echo("Hello World!");
 set variable = 5;
 echo(variable);
 
-echo(1 + 2 * 3);
-set x = 10 - 5;
-echo(x / 2);
+set variable = "Hello World!";
+echo(variable);

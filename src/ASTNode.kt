@@ -2,6 +2,10 @@
  * ASTノードを表す抽象基底クラス
  */
 sealed class ASTNode {
+    /**
+     * ASTノードビジター
+     * @property visitor ASTノードビジター
+     */
     abstract fun accept(visitor: ASTNodeVisitor): ASTNode?
 
     /**

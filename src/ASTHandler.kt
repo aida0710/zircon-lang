@@ -2,6 +2,11 @@
  * ASTノードを管理するためのユーティリティクラス
  */
 class ASTHandler {
+
+    /**
+     * 管理しているASTノードのリスト
+     * @property nodes ASTノードのリスト
+     */
     private val nodes = mutableListOf<ASTNode>()
 
     /**

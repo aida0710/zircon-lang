@@ -8,7 +8,7 @@ class Parser(private val input: List<Tokenizer.Token>, private val astHandler: A
     private var errorMessage: String? = null
 
     /**
-     * 全てのトークンを解析する
+     * 全てのトークンを解析
      * @return 解析結果のASTノードのリスト
      */
     fun parseAll(): List<ASTNode?> {
