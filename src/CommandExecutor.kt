@@ -9,7 +9,6 @@ class CommandExecutor(private val variables: MutableMap<String, ASTNode>) {
      * @return 処理結果のノード
      */
     fun executeEchoCommand(node: ASTNode.Sequence, visitor: ASTNodeVisitor): ASTNode? {
-        println("Echo command")
         val arguments = node.children.map { child ->
             when (val result = child.accept(visitor)) {
                 is ASTNode.String -> result.value
@@ -22,6 +21,7 @@ class CommandExecutor(private val variables: MutableMap<String, ASTNode>) {
                         else -> throw RuntimeException("Invalid variable value for echo command: $value")
                     }
                 }
+
                 is ASTNode.Sequence -> {
                     when (val evaluatedSequence = result.accept(visitor)) {
                         is ASTNode.String -> evaluatedSequence.value
@@ -29,6 +29,7 @@ class CommandExecutor(private val variables: MutableMap<String, ASTNode>) {
                         else -> throw RuntimeException("Invalid sequence result for echo command: $evaluatedSequence")
                     }
                 }
+
                 else -> throw RuntimeException("Invalid argument for echo command: $result")
             }
         }
